@@ -1,6 +1,6 @@
 import pandas as pd
 
-base_root = "D:/archivos_locales/TFG/datasets/tracknetV2_padel/test/4/"
+base_root = "D:/archivos_locales/TFG/datasets/tracknetV2_padel/validation/6/"
 
 label_df = pd.read_csv(base_root + "Label.csv")
 

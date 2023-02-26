@@ -30,4 +30,4 @@ def shift_file_name(directory, shift_amount):
             os.rename(old_file_path, new_file_path)
 
 # test the function
-shift_file_name("D:/archivos_locales/TFG/datasets/training/data4", 5222)
+shift_file_name("D:/archivos_locales/TFG/datasets/tracknetV2_padel/images/validation/6/data", 413)
