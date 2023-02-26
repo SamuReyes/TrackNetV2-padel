@@ -120,4 +120,4 @@ for i in range(len(outcome)):
 	elif outcome[i] == 4:
 		FN += 1
 
-print('(TP, TN, FP1, FP2, FN):', (TP, TN, FP1, FP2, FN))
+print('[TP, TN, FP1, FP2, FN]:', [TP, TN, FP1, FP2, FN])

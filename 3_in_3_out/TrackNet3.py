@@ -2,144 +2,140 @@ from keras.models import *
 from keras.layers import *
 from keras.activations import *
 
-def TrackNet3( input_height, input_width ): #input_height = 288, input_width = 512
 
-	imgs_input = Input(shape=(9,input_height,input_width))
+def TrackNet3(input_height, input_width):  # input_height = 288, input_width = 512
 
-	#Layer1
-	x = Conv2D(64, (3, 3), kernel_initializer='random_uniform', padding='same', data_format='channels_first' )(imgs_input)
-	x = ( Activation('relu'))(x)
-	x = ( BatchNormalization())(x)
+    imgs_input = Input(shape=(9, input_height, input_width))
 
-	#Layer2
-	x = Conv2D(64, (3, 3), kernel_initializer='random_uniform', padding='same', data_format='channels_first' )(x)
-	x = ( Activation('relu'))(x)
-	x1 = ( BatchNormalization())(x)
+    # Layer1
+    x = Conv2D(64, (3, 3), kernel_initializer='random_uniform', padding='same', data_format='channels_first')(imgs_input)
+    x = (Activation('relu'))(x)
+    x = (BatchNormalization())(x)
 
-	#Layer3
-	x = MaxPooling2D((2, 2), strides=(2, 2), data_format='channels_first' )(x1)
+    # Layer2
+    x = Conv2D(64, (3, 3), kernel_initializer='random_uniform', padding='same', data_format='channels_first')(x)
+    x = (Activation('relu'))(x)
+    x1 = (BatchNormalization())(x)
 
-	#Layer4
-	x = Conv2D(128, (3, 3), kernel_initializer='random_uniform', padding='same', data_format='channels_first' )(x)
-	x = ( Activation('relu'))(x)
-	x = ( BatchNormalization())(x)
+    # Layer3
+    x = MaxPooling2D((2, 2), strides=(2, 2), data_format='channels_first')(x1)
 
-	#Layer5
-	x = Conv2D(128, (3, 3), kernel_initializer='random_uniform', padding='same', data_format='channels_first' )(x)
-	x = ( Activation('relu'))(x)
-	x2 = ( BatchNormalization())(x)
-	#x2 = (Dropout(0.5))(x2) 
+    # Layer4
+    x = Conv2D(128, (3, 3), kernel_initializer='random_uniform', padding='same', data_format='channels_first')(x)
+    x = (Activation('relu'))(x)
+    x = (BatchNormalization())(x)
 
-	#Layer6
-	x = MaxPooling2D((2, 2), strides=(2, 2), data_format='channels_first' )(x2)
+    # Layer5
+    x = Conv2D(128, (3, 3), kernel_initializer='random_uniform', padding='same', data_format='channels_first')(x)
+    x = (Activation('relu'))(x)
+    x2 = (BatchNormalization())(x)
+    # x2 = (Dropout(0.5))(x2)
 
-	#Layer7
-	x = Conv2D(256, (3, 3), kernel_initializer='random_uniform', padding='same', data_format='channels_first' )(x)
-	x = ( Activation('relu'))(x)
-	x = ( BatchNormalization())(x)
+    # Layer6
+    x = MaxPooling2D((2, 2), strides=(2, 2), data_format='channels_first')(x2)
 
-	#Layer8
-	x = Conv2D(256, (3, 3), kernel_initializer='random_uniform', padding='same', data_format='channels_first' )(x)
-	x = ( Activation('relu'))(x)
-	x = ( BatchNormalization())(x)
+    # Layer7
+    x = Conv2D(256, (3, 3), kernel_initializer='random_uniform', padding='same', data_format='channels_first')(x)
+    x = (Activation('relu'))(x)
+    x = (BatchNormalization())(x)
 
-	#Layer9
-	x = Conv2D(256, (3, 3), kernel_initializer='random_uniform', padding='same', data_format='channels_first' )(x)
-	x = ( Activation('relu'))(x)
-	x3 = ( BatchNormalization())(x)
-	#x3 = (Dropout(0.5))(x3)
+    # Layer8
+    x = Conv2D(256, (3, 3), kernel_initializer='random_uniform', padding='same', data_format='channels_first')(x)
+    x = (Activation('relu'))(x)
+    x = (BatchNormalization())(x)
 
-	#Layer10
-	x = MaxPooling2D((2, 2), strides=(2, 2), data_format='channels_first' )(x3)
+    # Layer9
+    x = Conv2D(256, (3, 3), kernel_initializer='random_uniform', padding='same', data_format='channels_first')(x)
+    x = (Activation('relu'))(x)
+    x3 = (BatchNormalization())(x)
+    # x3 = (Dropout(0.5))(x3)
 
-	#Layer11
-	x = ( Conv2D(512, (3, 3), kernel_initializer='random_uniform', padding='same', data_format='channels_first'))(x)
-	x = ( Activation('relu'))(x)
-	x = ( BatchNormalization())(x)
+    # Layer10
+    x = MaxPooling2D((2, 2), strides=(2, 2), data_format='channels_first')(x3)
 
-	#Layer12
-	x = ( Conv2D(512, (3, 3), kernel_initializer='random_uniform', padding='same', data_format='channels_first'))(x)
-	x = ( Activation('relu'))(x)
-	x = ( BatchNormalization())(x)
+    # Layer11
+    x = (Conv2D(512, (3, 3), kernel_initializer='random_uniform', padding='same', data_format='channels_first'))(x)
+    x = (Activation('relu'))(x)
+    x = (BatchNormalization())(x)
 
-	#Layer13
-	x = ( Conv2D(512, (3, 3), kernel_initializer='random_uniform', padding='same', data_format='channels_first'))(x)
-	x = ( Activation('relu'))(x)
-	x = ( BatchNormalization())(x)
-	#x = (Dropout(0.5))(x)
+    # Layer12
+    x = (Conv2D(512, (3, 3), kernel_initializer='random_uniform', padding='same', data_format='channels_first'))(x)
+    x = (Activation('relu'))(x)
+    x = (BatchNormalization())(x)
 
-	#Layer14
-	#x = UpSampling2D( (2,2), data_format='channels_first')(x)
-	x = concatenate( [UpSampling2D( (2,2), data_format='channels_first')(x), x3], axis=1)
+    # Layer13
+    x = (Conv2D(512, (3, 3), kernel_initializer='random_uniform', padding='same', data_format='channels_first'))(x)
+    x = (Activation('relu'))(x)
+    x = (BatchNormalization())(x)
+    # x = (Dropout(0.5))(x)
 
-	#Layer15
-	x = ( Conv2D( 256, (3, 3), kernel_initializer='random_uniform', padding='same', data_format='channels_first'))(x)
-	x = ( Activation('relu'))(x)
-	x = ( BatchNormalization())(x)
+    # Layer14
+    # x = UpSampling2D( (2,2), data_format='channels_first')(x)
+    x = concatenate([UpSampling2D((2, 2), data_format='channels_first')(x), x3], axis=1)
 
-	#Layer16
-	x = ( Conv2D( 256, (3, 3), kernel_initializer='random_uniform', padding='same', data_format='channels_first'))(x)
-	x = ( Activation('relu'))(x)
-	x = ( BatchNormalization())(x)
+    # Layer15
+    x = (Conv2D(256, (3, 3), kernel_initializer='random_uniform', padding='same', data_format='channels_first'))(x)
+    x = (Activation('relu'))(x)
+    x = (BatchNormalization())(x)
 
-	#Layer17
-	x = ( Conv2D( 256, (3, 3), kernel_initializer='random_uniform', padding='same', data_format='channels_first'))(x)
-	x = ( Activation('relu'))(x)
-	x = ( BatchNormalization())(x)
-	
-	#Layer18
-	#x = UpSampling2D( (2,2), data_format='channels_first')(x)
-	x = concatenate( [UpSampling2D( (2,2), data_format='channels_first')(x), x2], axis=1)
+    # Layer16
+    x = (Conv2D(256, (3, 3), kernel_initializer='random_uniform', padding='same', data_format='channels_first'))(x)
+    x = (Activation('relu'))(x)
+    x = (BatchNormalization())(x)
 
-	#Layer19
-	x = ( Conv2D( 128 , (3, 3), kernel_initializer='random_uniform', padding='same' , data_format='channels_first' ))(x)
-	x = ( Activation('relu'))(x)
-	x = ( BatchNormalization())(x)
+    # Layer17
+    x = (Conv2D(256, (3, 3), kernel_initializer='random_uniform', padding='same', data_format='channels_first'))(x)
+    x = (Activation('relu'))(x)
+    x = (BatchNormalization())(x)
 
-	#Layer20
-	x = ( Conv2D( 128 , (3, 3), kernel_initializer='random_uniform', padding='same' , data_format='channels_first' ))(x)
-	x = ( Activation('relu'))(x)
-	x = ( BatchNormalization())(x)
+    # Layer18
+    # x = UpSampling2D( (2,2), data_format='channels_first')(x)
+    x = concatenate([UpSampling2D((2, 2), data_format='channels_first')(x), x2], axis=1)
 
-	#Layer21
-	#x = UpSampling2D( (2,2), data_format='channels_first')(x)
-	x = concatenate( [UpSampling2D( (2,2), data_format='channels_first')(x), x1], axis=1)
+    # Layer19
+    x = (Conv2D(128, (3, 3), kernel_initializer='random_uniform', padding='same', data_format='channels_first'))(x)
+    x = (Activation('relu'))(x)
+    x = (BatchNormalization())(x)
 
-	#Layer22
-	x = ( Conv2D( 64 , (3, 3), kernel_initializer='random_uniform', padding='same'  , data_format='channels_first' ))(x)
-	x = ( Activation('relu'))(x)
-	x = ( BatchNormalization())(x)
+    # Layer20
+    x = (Conv2D(128, (3, 3), kernel_initializer='random_uniform', padding='same', data_format='channels_first'))(x)
+    x = (Activation('relu'))(x)
+    x = (BatchNormalization())(x)
 
-	#Layer23
-	x = ( Conv2D( 64 , (3, 3), kernel_initializer='random_uniform', padding='same'  , data_format='channels_first' ))(x)
-	x = ( Activation('relu'))(x)
-	x = ( BatchNormalization())(x)
+    # Layer21
+    # x = UpSampling2D( (2,2), data_format='channels_first')(x)
+    x = concatenate([UpSampling2D((2, 2), data_format='channels_first')(x), x1], axis=1)
 
-	#Layer24
-	x =  Conv2D( 3 , (1, 1) , kernel_initializer='random_uniform', padding='same', data_format='channels_first' )(x)
-	x = ( Activation('sigmoid'))(x)
-        
+    # Layer22
+    x = (Conv2D(64, (3, 3), kernel_initializer='random_uniform', padding='same', data_format='channels_first'))(x)
+    x = (Activation('relu'))(x)
+    x = (BatchNormalization())(x)
 
-	o_shape = Model(imgs_input , x ).output_shape
+    # Layer23
+    x = (Conv2D(64, (3, 3), kernel_initializer='random_uniform', padding='same', data_format='channels_first'))(x)
+    x = (Activation('relu'))(x)
+    x = (BatchNormalization())(x)
 
-	#print ("layer24 output shape:", o_shape[1],o_shape[2],o_shape[3])
-	#Layer24 output shape: (3, 288, 512)
+    # Layer24
+    x = Conv2D(3, (1, 1), kernel_initializer='random_uniform', padding='same', data_format='channels_first')(x)
+    x = (Activation('sigmoid'))(x)
 
-	OutputHeight = o_shape[2]
-	OutputWidth = o_shape[3]
+    o_shape = Model(imgs_input, x).output_shape
 
-	output = x
+    # print ("layer24 output shape:", o_shape[1],o_shape[2],o_shape[3])
+    # Layer24 output shape: (3, 288, 512)
 
-	model = Model( imgs_input , output)
-	#model input unit:9*288*512, output unit:3*288*512
-	model.outputWidth = OutputWidth
-	model.outputHeight = OutputHeight
+    OutputHeight = o_shape[2]
+    OutputWidth = o_shape[3]
 
-	#Show model's details
-	#model.summary()
+    output = x
 
-	return model
+    model = Model(imgs_input, output)
+    # model input unit:9*288*512, output unit:3*288*512
+    model.outputWidth = OutputWidth
+    model.outputHeight = OutputHeight
 
+    # Show model's details
+    # model.summary()
 
-
-
+    return model
