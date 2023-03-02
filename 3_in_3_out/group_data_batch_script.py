@@ -29,5 +29,23 @@ def shift_file_name(directory, shift_amount):
             # rename the file
             os.rename(old_file_path, new_file_path)
 
-# test the function
-shift_file_name("D:/archivos_locales/TFG/datasets/tracknetV2_padel/images/train/19/data", 200)
+
+dir = "D:/archivos_locales/TFG/datasets/tracknetV2_padel/images/test/"
+
+file_list = os.listdir(dir)
+current_shift = 0
+
+# loop through the list of files
+for folder in file_list:
+    if os.path.isdir(dir + folder):
+        
+        current_dir = dir + folder + "/data"
+
+        frames = os.listdir(current_dir)
+       
+        for i in range(len(frames)):
+            frames[i] = int(frames[i][7:-4])
+
+        shift_file_name(current_dir, current_shift)
+
+        current_shift += max(frames)

@@ -105,8 +105,8 @@ while e < len(continuous_FN):
 			break
 	print('Number of '+ str(continuous_FN[s]) + ' successive FNs: ' + str(e - s))
 
-print('Outcome of every frame of the predicted labeling csv file (0 for TP, 1 for TN, 2 for FP1, 3 for FP2, 4 for FN):')
-print(outcome)
+#print('Outcome of every frame of the predicted labeling csv file (0 for TP, 1 for TN, 2 for FP1, 3 for FP2, 4 for FN):')
+#print(outcome)
 TP = TN = FP1 = FP2 = FN = 0
 for i in range(len(outcome)):
 	if outcome[i] == 0:
