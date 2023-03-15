@@ -168,6 +168,7 @@ def custom_loss(y_true, y_pred):  # hm_true, hm_pred
     # neg_loss = tf.reduce_sum(neg_loss)
 
     # loss = tf.cond(tf.greater(num_pos, 0), lambda: (pos_loss + neg_loss) / num_pos, lambda: neg_loss)
+    loss = 0
     loss = (-1)*(K.square(1 - y_pred) * y_true * K.log(K.clip(y_pred, K.epsilon(), 1)
                                                        ) + K.square(y_pred) * (1 - y_true) * K.log(K.clip(1 - y_pred, K.epsilon(), 1)))
 
@@ -184,7 +185,7 @@ def custom_loss(y_true, y_pred):  # hm_true, hm_pred
 # Training for the first time
 if paramCount['load_weights'] == 0:
     model = TrackNet3(HEIGHT, WIDTH)
-    ADADELTA = optimizers.Adadelta(learning_rate=1.0)
+    ADADELTA = optimizers.Adadelta(learning_rate=1)
     model.compile(loss=custom_loss, optimizer=ADADELTA, metrics=['accuracy'])
 # Retraining
 else:
@@ -208,11 +209,7 @@ print('Beginning training......')
 for i in range(epochs):
     print('============epoch', i+1, '================')
 
-
-    
-
-
-    """ --------- TRAIN & TRAIN LOSS --------- """ 
+    """ --------- TRAIN & TRAIN LOSS --------- """
     loss = 0
     np.random.shuffle(idx)
 
@@ -225,13 +222,14 @@ for i in range(epochs):
         loss += history.history['loss'][0]
         del x_train
         del y_train
-        
+
     loss_list.append(loss)
 
-    """ --------- VAL LOSS --------- """ 
+    """ --------- VAL LOSS --------- """
     val_loss = 0
     # Get loss for validation
     for j in val_idx:
+        print("HEY")
         val_x_train = np.load(os.path.abspath(os.path.join(valDir, 'x_data_' + str(j) + '.npy')))
         val_y_train = np.load(os.path.abspath(os.path.join(valDir, 'y_data_' + str(j) + '.npy')))
         val_y_pred = model.predict(val_x_train, batch_size=BATCH_SIZE)
@@ -242,7 +240,7 @@ for i in range(epochs):
         del val_y_pred
 
     val_loss_list.append(val_loss)
-
+    print(val_loss_list)
 
     """ -----  Show the outcome of training data so long ----- """
     """
