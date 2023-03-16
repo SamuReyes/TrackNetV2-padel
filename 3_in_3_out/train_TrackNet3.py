@@ -27,6 +27,8 @@ WIDTH = 512
 mag = 1
 sigma = 2.5
 
+validation_metrics = 1
+
 
 def outcome(y_pred, y_true, tol):
     """ Return the numbers of true positive, true negative, false positive and false negative """
@@ -97,6 +99,17 @@ def evaluation(y_pred, y_true, tol):
         recall = 0
     return (accuracy, precision, recall)
 
+def compute_metrics(TP, TN, FP1, FP2, FN):
+        FP = FP1 + FP2
+        recall = TP / (TP + FN)
+        specificity = TN / (TN + FP)
+        precision = TP / (TP + FP)
+        accuracy = (TN + TP) / (TN + TP + FN + FP)
+        tpr = TP / (TP + FN)
+        tnr = FP / ( FP + TN) 
+        f1 = (precision*recall) / (precision+recall)
+
+        return [recall, specificity, precision, accuracy, tpr, tnr, f1]
 
 try:
     (opts, args) = getopt.getopt(sys.argv[1:], '', [
@@ -105,12 +118,13 @@ try:
         'dataDir=',
         'valDir=',
         'epochs=',
-        'tol='
+        'tol=',
+        "validation="
     ])
-    if len(opts) < 5:
+    if len(opts) < 6:
         raise ''
 except:
-    print('usage: python3 train_TrackNet3.py --load_weights=<previousWeightPath> --save_weights=<newWeightPath> --dataDir=<npyDataDirectory> --valDir=<npyValidationDirectory> --epochs=<trainingEpochs> --tol=<toleranceValue>')
+    print('usage: python3 train_TrackNet3.py --load_weights=<previousWeightPath> --save_weights=<newWeightPath> --dataDir=<npyDataDirectory> --valDir=<npyValidationDirectory> --epochs=<trainingEpochs> --tol=<toleranceValue> --validation=<1 for validation 0 for no validation>')
     print('argument --load_weights is required only if you want to retrain the model')
     exit(1)
 
@@ -120,7 +134,8 @@ paramCount = {
     'dataDir': 0,
     'valDir': 0,
     'epochs': 0,
-    'tol': 0
+    'tol': 0,
+    'validation': 0
 }
 
 for (opt, arg) in opts:
@@ -142,13 +157,16 @@ for (opt, arg) in opts:
     elif opt == '--tol':
         paramCount['tol'] += 1
         tol = int(arg)
+    elif opt == '--validation':
+        paramCount['validation'] += 1
+        validation_metrics = int(arg)
     else:
-        print('usage: python3 train_TrackNet3.py --load_weights=<previousWeightPath> --save_weights=<newWeightPath> --dataDir=<npyDataDirectory> --valDir=<npyValidationDirectory> --epochs=<trainingEpochs> --tol=<toleranceValue>')
+        print('usage: python3 train_TrackNet3.py --load_weights=<previousWeightPath> --save_weights=<newWeightPath> --dataDir=<npyDataDirectory> --valDir=<npyValidationDirectory> --epochs=<trainingEpochs> --tol=<toleranceValue> --validation=<1 for validation 0 for no validation>')
         print('argument --load_weights is required only if you want to retrain the model')
         exit(1)
 
-if paramCount['save_weights'] == 0 or paramCount['dataDir'] == 0 or paramCount['valDir'] == 0 or paramCount['epochs'] == 0 or paramCount['tol'] == 0:
-    print('usage: python3 train_TrackNet3.py --load_weights=<previousWeightPath> --save_weights=<newWeightPath> --dataDir=<npyDataDirectory> --valDir=<npyValidationDirectory> --epochs=<trainingEpochs> --tol=<toleranceValue>')
+if paramCount['save_weights'] == 0 or paramCount['dataDir'] == 0 or paramCount['valDir'] == 0 or paramCount['epochs'] == 0 or paramCount['tol'] == 0 or paramCount['validation'] == 0:
+    print('usage: python3 train_TrackNet3.py --load_weights=<previousWeightPath> --save_weights=<newWeightPath> --dataDir=<npyDataDirectory> --valDir=<npyValidationDirectory> --epochs=<trainingEpochs> --tol=<toleranceValue> --validation=<1 for validation 0 for no validation>')
     print('argument --load_weights is required only if you want to retrain the model')
     exit(1)
 
@@ -156,30 +174,30 @@ if paramCount['save_weights'] == 0 or paramCount['dataDir'] == 0 or paramCount['
 
 
 def custom_loss(y_true, y_pred):  # hm_true, hm_pred
-    # pos_mask = tf.cast(tf.equal(hm_true, 1), tf.float32)
-    # neg_mask = tf.cast(tf.less(hm_true, 1), tf.float32)
-    # neg_weights = tf.pow(1 - hm_true, 4)
+    #pos_mask = tf.cast(tf.equal(hm_true, 1), tf.float32)
+    #neg_mask = tf.cast(tf.less(hm_true, 1), tf.float32)
+    #neg_weights = tf.pow(1 - hm_true, 4)
 
-    # pos_loss = -tf.log(tf.clip_by_value(hm_pred, 1e-4, 1. - 1e-4)) * tf.pow(1 - hm_pred, 2) * pos_mask
-    # neg_loss = -tf.log(tf.clip_by_value(1 - hm_pred, 1e-4, 1. - 1e-4)) * tf.pow(hm_pred, 2) * neg_weights * neg_mask
+    #pos_loss = -tf.log(tf.clip_by_value(hm_pred, 1e-4, 1. - 1e-4)) * tf.pow(1 - hm_pred, 2) * pos_mask
+    #neg_loss = -tf.log(tf.clip_by_value(1 - hm_pred, 1e-4, 1. - 1e-4)) * tf.pow(hm_pred, 2) * neg_weights * neg_mask
 
-    # num_pos = tf.reduce_sum(pos_mask)
-    # pos_loss = tf.reduce_sum(pos_loss)
-    # neg_loss = tf.reduce_sum(neg_loss)
+    #num_pos = tf.reduce_sum(pos_mask)
+    #pos_loss = tf.reduce_sum(pos_loss)
+    #neg_loss = tf.reduce_sum(neg_loss)
 
-    # loss = tf.cond(tf.greater(num_pos, 0), lambda: (pos_loss + neg_loss) / num_pos, lambda: neg_loss)
-    loss = 0
-    loss = (-1)*(K.square(1 - y_pred) * y_true * K.log(K.clip(y_pred, K.epsilon(), 1)
-                                                       ) + K.square(y_pred) * (1 - y_true) * K.log(K.clip(1 - y_pred, K.epsilon(), 1)))
+    #loss = tf.cond(tf.greater(num_pos, 0), lambda: (pos_loss + neg_loss) / num_pos, lambda: neg_loss)
+    #loss = 0
+    #loss = (-1)*(K.square(1 - y_pred) * y_true * K.log(K.clip(y_pred, K.epsilon(), 1)
+                                                       #) + K.square(y_pred) * (1 - y_true) * K.log(K.clip(1 - y_pred, K.epsilon(), 1)))
 
-    # gamma=2
-    # alpha=0.25
-    # y_true = tf.cast(y_true, tf.float32)
-    # alpha_t = y_true*alpha + (K.ones_like(y_true)-y_true)*(1-alpha)
-    # p_t = y_true*y_pred + (K.ones_like(y_true)-y_true)*(K.ones_like(y_true)-y_pred) + K.epsilon()
-    # focal_loss = - alpha_t * K.pow((K.ones_like(y_true)-p_t),gamma) * K.log(p_t)
-    # return K.mean(focal_loss)
-    return (loss)
+    gamma=2
+    alpha=0.25
+    y_true = tf.cast(y_true, tf.float32)
+    alpha_t = y_true*alpha + (K.ones_like(y_true)-y_true)*(1-alpha)
+    p_t = y_true*y_pred + (K.ones_like(y_true)-y_true)*(K.ones_like(y_true)-y_pred) + K.epsilon()
+    focal_loss = - alpha_t * K.pow((K.ones_like(y_true)-p_t),gamma) * K.log(p_t)
+    return K.mean(focal_loss)
+    #return (loss)
 
 
 # Training for the first time
@@ -226,49 +244,84 @@ for i in range(epochs):
     loss_list.append(loss)
 
     """ --------- VAL LOSS --------- """
+    TP = TN = FP1 = FP2 = FN = 0
     val_loss = 0
     # Get loss for validation
     for j in val_idx:
-        print("HEY")
         val_x_train = np.load(os.path.abspath(os.path.join(valDir, 'x_data_' + str(j) + '.npy')))
         val_y_train = np.load(os.path.abspath(os.path.join(valDir, 'y_data_' + str(j) + '.npy')))
         val_y_pred = model.predict(val_x_train, batch_size=BATCH_SIZE)
-        val_loss += ((tf.reduce_sum(custom_loss(val_y_train, val_y_pred), [0, 1, 2, 3])).numpy())/(BATCH_SIZE*3*HEIGHT*WIDTH)
+        #val_loss += ((tf.reduce_sum(custom_loss(val_y_train, val_y_pred), [0, 1, 2, 3])).numpy())/(BATCH_SIZE*3*HEIGHT*WIDTH)
+        val_loss += custom_loss(val_y_train, val_y_pred)
+
+        """ --------- VALIDATION METRICS (VALIDATION) --------- """
+        if validation_metrics == 1:
+            val_y_pred = val_y_pred > 0.5
+            val_y_pred = val_y_pred.astype('float32')
+            (tp, tn, fp1, fp2, fn) = outcome(val_y_pred, val_y_train, tol)
+            TP += tp
+            TN += tn
+            FP1 += fp1
+            FP2 += fp2
+            FN += fn
 
         del val_x_train
         del val_y_train
         del val_y_pred
 
-    val_loss_list.append(val_loss)
-    print(val_loss_list)
+    val_loss_list.append(val_loss.numpy())
 
-    """ -----  Show the outcome of training data so long ----- """
-    """
-    TP = TN = FP1 = FP2 = FN = 0
-    for j in idx:
-        x_train = np.load(os.path.abspath(os.path.join(dataDir, 'x_data_' + str(j) + '.npy')))
-        y_train = np.load(os.path.abspath(os.path.join(dataDir, 'y_data_' + str(j) + '.npy')))
-        y_pred = model.predict(x_train, batch_size=BATCH_SIZE)
-        y_pred = y_pred > 0.5
-        y_pred = y_pred.astype('float32')
-        (tp, tn, fp1, fp2, fn) = outcome(y_pred, y_train, tol)
-        TP += tp
-        TN += tn
-        FP1 += fp1
-        FP2 += fp2
-        FN += fn
-        del x_train
-        del y_train
-        del y_pred
+    """ --------- VALIDATION METRICS (VALIDATION) --------- """
+    if validation_metrics == 1:
+        val_metrics = compute_metrics(max(TP,1), max(TN,1), max(FP1,1), max(FP2,1), max(FN,1))
+                
+        # Save metrics into a txt file
+        with open(save_weights + "_val_metrics.txt", "a+") as val_metrics_out:
+            val_metrics_out.write("Epoch {}:\n".format(i+1))
+            val_metrics_out.write("[TP, TN, FP1, FP2, FN]: [{}, {}, {}, {}, {}]\n".format(TP, TN, FP1, FP2, FN))
+            val_metrics_out.write("recall: {:.3f}\n".format(val_metrics[0]*100))
+            val_metrics_out.write("specificity: {:.3f}\n".format(val_metrics[1]*100))
+            val_metrics_out.write("precision: {:.3f}\n".format(val_metrics[2]*100))
+            val_metrics_out.write("accuracy: {:.3f}\n".format(val_metrics[3]*100))
+            val_metrics_out.write("tpr: {:.3f}\n".format(val_metrics[4]*100))
+            val_metrics_out.write("tnr: {:.3f}\n".format(val_metrics[5]*100))
+            val_metrics_out.write("f1: {:.3f}\n".format(val_metrics[6]*100))
+            val_metrics_out.write("------------------------------------------\n")
+
+    """ -----  VALIDATION METRICS (TRAIN) ----- """
     
-    print("Outcome of training data of epoch " + str(i+1) + ":")
-    print("Number of true positive:", TP)
-    print("Number of true negative:", TN)
-    print("Number of false positive FP1:", FP1)
-    print("Number of false positive FP2:", FP2)
-    print("Number of false negative:", FN)    
+    if validation_metrics == 1:
+        TP = TN = FP1 = FP2 = FN = 0
+        for j in idx:
+            x_train = np.load(os.path.abspath(os.path.join(dataDir, 'x_data_' + str(j) + '.npy')))
+            y_train = np.load(os.path.abspath(os.path.join(dataDir, 'y_data_' + str(j) + '.npy')))
+            y_pred = model.predict(x_train, batch_size=BATCH_SIZE)
+            y_pred = y_pred > 0.5
+            y_pred = y_pred.astype('float32')
+            (tp, tn, fp1, fp2, fn) = outcome(y_pred, y_train, tol)
+            TP += tp
+            TN += tn
+            FP1 += fp1
+            FP2 += fp2
+            FN += fn
+            del x_train
+            del y_train
+            del y_pred
         
-	"""
+        train_metrics = compute_metrics(max(TP,1), max(TN,1), max(FP1,1), max(FP2,1), max(FN,1))
+
+        # Save metrics into a txt file
+        with open(save_weights + "_train_metrics.txt", "a+") as train_metrics_out:
+            train_metrics_out.write("Epoch {}:\n".format(i+1))
+            train_metrics_out.write("[TP, TN, FP1, FP2, FN]: [{}, {}, {}, {}, {}]\n".format(TP, TN, FP1, FP2, FN))
+            train_metrics_out.write("recall: {:.3f}\n".format(train_metrics[0]*100))
+            train_metrics_out.write("specificity: {:.3f}\n".format(train_metrics[1]*100))
+            train_metrics_out.write("precision: {:.3f}\n".format(train_metrics[2]*100))
+            train_metrics_out.write("accuracy: {:.3f}\n".format(train_metrics[3]*100))
+            train_metrics_out.write("tpr: {:.3f}\n".format(train_metrics[4]*100))
+            train_metrics_out.write("tnr: {:.3f}\n".format(train_metrics[5]*100))
+            train_metrics_out.write("f1: {:.3f}\n".format(train_metrics[6]*100))
+            train_metrics_out.write("------------------------------------------\n")
 
     # Save intermediate weights during training
     if (i + 1) % 1 == 0:
@@ -281,6 +334,11 @@ model.save(save_weights)
 loss_list[:] = [x / num for x in loss_list]
 val_loss_list[:] = [x / val_num for x in val_loss_list]
 
+# Save loss into a txt file
+with open(save_weights + "_loss.txt", "w") as loss_out:
+   loss_out.write("Train loss: " + str(loss_list) + "\n")
+   loss_out.write("Val loss: " + str(val_loss_list))
+
 #############################
 title = 'Model Loss'
 plt.title(title)
@@ -289,7 +347,7 @@ plt.ylabel('loss')
 x = np.arange(1, epochs+1, 1)
 plt.plot(x, loss_list)
 plt.plot(x, val_loss_list)
-plt.savefig(title + '.jpg')
+plt.savefig(save_weights + "model_loss" + ".jpg")
 #############################
 
 print('Done......')
