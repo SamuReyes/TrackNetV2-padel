@@ -327,6 +327,15 @@ for i in range(epochs):
     if (i + 1) % 1 == 0:
         model.save(save_weights + '_' + str(i + 1))
 
+        # Compute the mean of the loss
+        loss_list[:] = [x / num for x in loss_list]
+        val_loss_list[:] = [x / val_num for x in val_loss_list]
+
+        # Save loss into a txt file
+        with open(save_weights + "_loss.txt", "w") as loss_out:
+            loss_out.write("Train loss: " + str(loss_list) + "\n")
+            loss_out.write("Val loss: " + str(val_loss_list))
+
 print('Saving weights......')
 model.save(save_weights)
 
