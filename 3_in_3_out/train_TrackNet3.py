@@ -119,12 +119,13 @@ try:
         'valDir=',
         'epochs=',
         'tol=',
-        "validation="
+        "validation=",
+        "loss="
     ])
     if len(opts) < 6:
         raise ''
 except:
-    print('usage: python3 train_TrackNet3.py --load_weights=<previousWeightPath> --save_weights=<newWeightPath> --dataDir=<npyDataDirectory> --valDir=<npyValidationDirectory> --epochs=<trainingEpochs> --tol=<toleranceValue> --validation=<1 for validation 0 for no validation>')
+    print('usage: python3 train_TrackNet3.py --load_weights=<previousWeightPath> --save_weights=<newWeightPath> --dataDir=<npyDataDirectory> --valDir=<npyValidationDirectory> --epochs=<trainingEpochs> --tol=<toleranceValue> --validation=<1 for validation 0 for no validation> --loss=<from 1 to 5>')
     print('argument --load_weights is required only if you want to retrain the model')
     exit(1)
 
@@ -135,7 +136,8 @@ paramCount = {
     'valDir': 0,
     'epochs': 0,
     'tol': 0,
-    'validation': 0
+    'validation': 0,
+    'loss': 0
 }
 
 for (opt, arg) in opts:
@@ -160,45 +162,76 @@ for (opt, arg) in opts:
     elif opt == '--validation':
         paramCount['validation'] += 1
         validation_metrics = int(arg)
+    elif opt == '--loss':
+        paramCount['loss'] += 1
+        loss_function = int(arg)
     else:
-        print('usage: python3 train_TrackNet3.py --load_weights=<previousWeightPath> --save_weights=<newWeightPath> --dataDir=<npyDataDirectory> --valDir=<npyValidationDirectory> --epochs=<trainingEpochs> --tol=<toleranceValue> --validation=<1 for validation 0 for no validation>')
+        print('usage: python3 train_TrackNet3.py --load_weights=<previousWeightPath> --save_weights=<newWeightPath> --dataDir=<npyDataDirectory> --valDir=<npyValidationDirectory> --epochs=<trainingEpochs> --tol=<toleranceValue> --validation=<1 for validation 0 for no validation> --loss=<from 1 to 5>')
         print('argument --load_weights is required only if you want to retrain the model')
         exit(1)
 
-if paramCount['save_weights'] == 0 or paramCount['dataDir'] == 0 or paramCount['valDir'] == 0 or paramCount['epochs'] == 0 or paramCount['tol'] == 0 or paramCount['validation'] == 0:
-    print('usage: python3 train_TrackNet3.py --load_weights=<previousWeightPath> --save_weights=<newWeightPath> --dataDir=<npyDataDirectory> --valDir=<npyValidationDirectory> --epochs=<trainingEpochs> --tol=<toleranceValue> --validation=<1 for validation 0 for no validation>')
+if paramCount['save_weights'] == 0 or paramCount['dataDir'] == 0 or paramCount['valDir'] == 0 or paramCount['epochs'] == 0 or paramCount['tol'] == 0 or paramCount['validation'] == 0 or paramCount['loss'] == 0:
+    print('usage: python3 train_TrackNet3.py --load_weights=<previousWeightPath> --save_weights=<newWeightPath> --dataDir=<npyDataDirectory> --valDir=<npyValidationDirectory> --epochs=<trainingEpochs> --tol=<toleranceValue> --validation=<1 for validation 0 for no validation> --loss=<from 1 to 5>')
     print('argument --load_weights is required only if you want to retrain the model')
     exit(1)
 
 # Loss function
 
+loss_function = 1
+def custom_loss(y_true, y_pred):
 
-def custom_loss(y_true, y_pred):  # hm_true, hm_pred
-    #pos_mask = tf.cast(tf.equal(hm_true, 1), tf.float32)
-    #neg_mask = tf.cast(tf.less(hm_true, 1), tf.float32)
-    #neg_weights = tf.pow(1 - hm_true, 4)
+    # Basada en mapas de calor
+    if loss_function == 1:
+        loss = 0
+        y_pred = tf.cast(y_pred, tf.float32)
+        y_true = tf.cast(y_true, tf.float32)
+        pos_mask = tf.cast(tf.equal(y_true, 1), tf.float32)
+        neg_mask = tf.cast(tf.less(y_true, 1), tf.float32)
+        neg_weights = tf.pow(1 - y_true, 4)
 
-    #pos_loss = -tf.log(tf.clip_by_value(hm_pred, 1e-4, 1. - 1e-4)) * tf.pow(1 - hm_pred, 2) * pos_mask
-    #neg_loss = -tf.log(tf.clip_by_value(1 - hm_pred, 1e-4, 1. - 1e-4)) * tf.pow(hm_pred, 2) * neg_weights * neg_mask
+        pos_loss = -tf.math.log(tf.clip_by_value(y_pred, 1e-4, 1. - 1e-4)) * tf.pow(1 - y_pred, 2) * pos_mask
+        neg_loss = -tf.math.log(tf.clip_by_value(1 - y_pred, 1e-4, 1. - 1e-4)) * tf.pow(y_pred, 2) * neg_weights * neg_mask
 
-    #num_pos = tf.reduce_sum(pos_mask)
-    #pos_loss = tf.reduce_sum(pos_loss)
-    #neg_loss = tf.reduce_sum(neg_loss)
+        num_pos = tf.reduce_sum(pos_mask)
+        pos_loss = tf.reduce_sum(pos_loss)
+        neg_loss = tf.reduce_sum(neg_loss)
 
-    #loss = tf.cond(tf.greater(num_pos, 0), lambda: (pos_loss + neg_loss) / num_pos, lambda: neg_loss)
-    #loss = 0
-    #loss = (-1)*(K.square(1 - y_pred) * y_true * K.log(K.clip(y_pred, K.epsilon(), 1)
-                                                       #) + K.square(y_pred) * (1 - y_true) * K.log(K.clip(1 - y_pred, K.epsilon(), 1)))
+        loss = tf.cond(tf.greater(num_pos, 0), lambda: (pos_loss + neg_loss) / num_pos, lambda: neg_loss)
 
-    gamma=2
-    alpha=0.25
-    y_true = tf.cast(y_true, tf.float32)
-    alpha_t = y_true*alpha + (K.ones_like(y_true)-y_true)*(1-alpha)
-    p_t = y_true*y_pred + (K.ones_like(y_true)-y_true)*(K.ones_like(y_true)-y_pred) + K.epsilon()
-    focal_loss = - alpha_t * K.pow((K.ones_like(y_true)-p_t),gamma) * K.log(p_t)
-    return K.mean(focal_loss)
-    #return (loss)
+        return (loss)
+    
+    # Basada en focal loss (segunda prueba)
+    elif loss_function == 2:
 
+        gamma=2
+        alpha=0.25
+        y_true = tf.cast(y_true, tf.float32)
+        alpha_t = y_true*alpha + (K.ones_like(y_true)-y_true)*(1-alpha)
+        p_t = y_true*y_pred + (K.ones_like(y_true)-y_true)*(K.ones_like(y_true)-y_pred) + K.epsilon()
+        focal_loss = - alpha_t * K.pow((K.ones_like(y_true)-p_t),gamma) * K.log(p_t)
+
+        return K.mean(focal_loss)
+    
+    # Por defecto
+    elif loss_function == 3:
+        loss = 0
+        loss = (-1)*(K.square(1 - y_pred) * y_true * K.log(K.clip(y_pred, K.epsilon(), 1)) + K.square(y_pred) * (1 - y_true) * K.log(K.clip(1 - y_pred, K.epsilon(), 1)))
+        return (loss)
+    
+    # WBCE (descrita en el paper de TrackNetV2)
+    elif loss_function == 4:
+        w = y_pred
+        pos_loss = (1 - w) ** 2 * y_true * tf.math.log(y_pred + 1e-8)
+        neg_loss = w ** 2 * (1 - y_true) * tf.math.log(1 - y_pred + 1e-8)
+        wbce_loss = -tf.reduce_sum(pos_loss + neg_loss)
+        return (wbce_loss)
+    
+    # Similar a WBCE pero usada en monotrack
+    elif loss_function == 5:
+        w = y_pred
+        loss = -K.sum((1 - w) ** 2 * y_true * K.log(K.clip(y_pred, K.epsilon(), 1 - K.epsilon())) +
+                  w ** 2 * (1 - y_true) * K.log(K.clip(1 - y_pred, K.epsilon(), 1 - K.epsilon())))
+        return loss
 
 # Training for the first time
 if paramCount['load_weights'] == 0:
@@ -237,7 +270,7 @@ for i in range(epochs):
         y_train = np.load(os.path.abspath(os.path.join(dataDir, 'y_data_' + str(j) + '.npy')))
         history = model.fit(x_train, y_train, batch_size=BATCH_SIZE, epochs=1)
         #############
-        loss += history.history['loss'][0]
+        loss += (history.history['loss'][0])/num
         del x_train
         del y_train
 
@@ -269,7 +302,7 @@ for i in range(epochs):
         del val_y_train
         del val_y_pred
 
-    val_loss_list.append(val_loss.numpy())
+    val_loss_list.append(val_loss.numpy()/val_num)
 
     """ --------- VALIDATION METRICS (VALIDATION) --------- """
     if validation_metrics == 1:
@@ -327,10 +360,6 @@ for i in range(epochs):
     if (i + 1) % 1 == 0:
         model.save(save_weights + '_' + str(i + 1))
 
-        # Compute the mean of the loss
-        loss_list[:] = [x / num for x in loss_list]
-        val_loss_list[:] = [x / val_num for x in val_loss_list]
-
         # Save loss into a txt file
         with open(save_weights + "_loss.txt", "w") as loss_out:
             loss_out.write("Train loss: " + str(loss_list) + "\n")
@@ -338,10 +367,6 @@ for i in range(epochs):
 
 print('Saving weights......')
 model.save(save_weights)
-
-# Compute the mean of the loss
-loss_list[:] = [x / num for x in loss_list]
-val_loss_list[:] = [x / val_num for x in val_loss_list]
 
 # Save loss into a txt file
 with open(save_weights + "_loss.txt", "w") as loss_out:
