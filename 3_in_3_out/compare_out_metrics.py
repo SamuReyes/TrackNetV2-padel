@@ -26,7 +26,7 @@ def plot_comparison(data1, data2, title):
         plt.legend()
         plt.show()
 
-file1_data = read_data('D:/archivos_locales/TFG/codigo/TrackNetV2-padel/models/pruebas/loss_5_3/experimento_train_metrics.txt')
-file2_data = read_data('D:/archivos_locales/TFG/codigo/TrackNetV2-padel/models/pruebas/loss_5_3/experimento_val_metrics.txt')
+file1_data = read_data('D:/archivos_locales/TFG/codigo/TrackNetV2-padel/models/experimento5/modelo_train_metrics.txt')
+file2_data = read_data('D:/archivos_locales/TFG/codigo/TrackNetV2-padel/models/experimento5/modelo_val_metrics.txt')
 
 plot_comparison(file1_data, file2_data, 'Files')
