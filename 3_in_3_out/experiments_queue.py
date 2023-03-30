@@ -5,9 +5,9 @@ path_tiempos = "D:/archivos_locales/TFG/codigo/TrackNetV2-padel/models/pruebas"
 
 path_weights = "D:/archivos_locales/TFG/codigo/TrackNetV2-padel/models/model906_30"
 
-path_experimento1 = "D:/archivos_locales/TFG/codigo/TrackNetV2-padel/models/pruebas/experimento_prueba_1/modelo"
-path_experimento2 = "D:/archivos_locales/TFG/codigo/TrackNetV2-padel/models/pruebas/experimento_prueba_2/modelo"
-path_experimento3 = "D:/archivos_locales/TFG/codigo/TrackNetV2-padel/models/pruebas/experimento_prueba_3/modelo"
+path_experimento1 = "D:/archivos_locales/TFG/codigo/TrackNetV2-padel/models/pruebas/experimento_prueba_1/model"
+path_experimento2 = "D:/archivos_locales/TFG/codigo/TrackNetV2-padel/models/pruebas/experimento_prueba_2/model"
+path_experimento3 = "D:/archivos_locales/TFG/codigo/TrackNetV2-padel/models/pruebas/experimento_prueba_3/model"
 
 path_data_train = "D:/archivos_locales/TFG/datasets/tracknetV2_padel/npy_2folds_noball/extras_test"
 path_data_val = "D:/archivos_locales/TFG/datasets/tracknetV2_padel/npy_2folds_noball/extras_validacion"
