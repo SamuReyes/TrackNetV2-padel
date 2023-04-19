@@ -4,12 +4,10 @@ import numpy as np
 
 metrics = np.array(
     [
-        [330, 6, 51, 2, 49],
-[174, 11, 37, 5, 46],
-[164, 14, 12, 1, 25],
-[431, 104, 195, 3, 56],
-[175, 38, 98, 3, 31],
-[171, 57, 110, 9, 52]
+        [415, 37, 49, 1, 56],
+[573, 188, 34, 3, 69],
+[526, 112, 26, 7, 22],
+[542, 140, 98, 1, 80]
     ]
 )
 total1 = np.array([0, 0, 0, 0, 0])  # Include FP1 and FP2
@@ -38,3 +36,4 @@ print("specificity: ", specificity*100)
 print("precision: ", precision*100)
 print("accuracy: ", accuracy*100)
 print("f1: ", f1*100)
+print("tnr: ", tnr*100)

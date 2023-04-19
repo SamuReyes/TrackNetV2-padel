@@ -30,7 +30,7 @@ def shift_file_name(directory, shift_amount):
             os.rename(old_file_path, new_file_path)
 
 
-dir = "D:/archivos_locales/TFG/datasets/tracknetV2_padel/images/train/"
+dir = "D:/archivos_locales/TFG/datasets/tracknetV2_padel/npy_4folds_occluded/validation/"
 
 file_list = os.listdir(dir)
 current_shift = 0
