@@ -31,7 +31,7 @@ def TrackNet3(input_height, input_width):  # input_height = 288, input_width = 5
     #x = add([xb, x])
     x = (Activation('relu'))(x)
     x2 = (BatchNormalization())(x)
-    x2 = (Dropout(0.25))(x2)
+    #x2 = (Dropout(0.25))(x2)
 
     # Layer6
     x = MaxPooling2D((2, 2), strides=(2, 2), data_format='channels_first')(x2)
@@ -51,7 +51,7 @@ def TrackNet3(input_height, input_width):  # input_height = 288, input_width = 5
     #x = add([xc, x])
     x = (Activation('relu'))(x)
     x3 = (BatchNormalization())(x)
-    x3 = (Dropout(0.25))(x3)
+    #x3 = (Dropout(0.25))(x3)
 
     # Layer10
     x = MaxPooling2D((2, 2), strides=(2, 2), data_format='channels_first')(x3)
@@ -71,7 +71,7 @@ def TrackNet3(input_height, input_width):  # input_height = 288, input_width = 5
     #x = add([xd, x])
     x = (Activation('relu'))(x)
     x = (BatchNormalization())(x)
-    x = (Dropout(0.25))(x)
+    #x = (Dropout(0.25))(x)
 
     # Layer14
     # x = UpSampling2D( (2,2), data_format='channels_first')(x)

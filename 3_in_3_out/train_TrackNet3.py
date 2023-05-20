@@ -232,6 +232,26 @@ def custom_loss(y_true, y_pred):
         loss = -K.sum((1 - w) ** 2 * y_true * K.log(K.clip(y_pred, K.epsilon(), 1 - K.epsilon())) +
                   w ** 2 * (1 - y_true) * K.log(K.clip(1 - y_pred, K.epsilon(), 1 - K.epsilon())))
         return loss
+    
+    # Usada en monotrack (dice loss y binary cross_entropy)
+    elif loss_function == 6:
+        from tensorflow.keras.losses import BinaryCrossentropy
+        # Dice loss
+        numerator = 2 * tf.reduce_sum(y_true * y_pred, axis=[1, 2, 3]) + 1e-8
+        denominator = tf.reduce_sum(y_true + y_pred + 0.0001, axis=[1, 2, 3]) + 1e-8
+        dice_loss = 1 - tf.reduce_mean(numerator / denominator)
+
+        # Binary cross-entropy loss
+        bce_loss = tf.reduce_mean(BinaryCrossentropy(y_true, y_pred))
+
+        # Combine the losses
+        combined_loss = 0.9 * bce_loss + 0.1 * dice_loss
+        return combined_loss
+    
+    elif loss_function == 7:
+        y_pred = K.clip(y_pred, K.epsilon(), 1 - K.epsilon())  # Asegurar que y_pred esté en el rango [epsilon, 1-epsilon]
+        loss = -y_true * K.log(y_pred) - (1 - y_true) * K.log(1 - y_pred)
+        return loss
 
 # Training for the first time
 if paramCount['load_weights'] == 0:

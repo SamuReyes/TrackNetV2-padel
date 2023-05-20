@@ -1,7 +1,7 @@
 import os
 
 directory_name = "D:/archivos_locales/TFG/datasets/tracknetV2_padel/images/test"
-weights = "D:/archivos_locales/TFG/codigo/TrackNetV2-padel/models/loss3/modelo_15"
+weights = "D:/archivos_locales/TFG/codigo/TrackNetV2-padel/models/loss6-occluded/modelo_10"
 
 # Remove old predict files
 for clip in os.listdir(directory_name):

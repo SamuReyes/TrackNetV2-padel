@@ -1,7 +1,7 @@
 import re
 import matplotlib.pyplot as plt
 
-PATH = 'D:/archivos_locales/TFG/codigo/TrackNetV2-padel/models/loss4/'
+PATH = 'D:/archivos_locales/TFG/codigo/TrackNetV2-padel/models/loss6-occluded/'
 
 def read_data(filename):
     with open(filename, 'r') as f:
