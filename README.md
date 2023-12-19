@@ -1,6 +1,4 @@
-###### tags: `CoachAI` `TrackNetV2` `GitLab`
-
-# TrackNetV2: Efficient TrackNet (GitLab)
+# TrackNetV2: Efficient TrackNet
 
 ## :gear: 1. Install
 ### System Environment
@@ -8,7 +6,7 @@
 - Ubuntu 18.04
 - NVIDIA Gerfore GTX1080Ti
 - Python3.5.2 / git / PYQT5 / OpenCV / pandas / numpy / PyMySQL
-- TensorFlow 1.13.1/keras 2.2.4/Opencv 4.1.0/CUDA 10.1 (for TrackNetV2)
+- TensorFlow 1.13.1/keras 2.2.4/Opencv 4.1.0/CUDA 10.1
 
 ### Package
 - GitLab: https://nol.cs.nctu.edu.tw:234/open-source/TrackNetv2
